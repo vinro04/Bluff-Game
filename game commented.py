@@ -1,430 +1,476 @@
-# Import required libraries
-import tkinter as tk  # Main GUI library
-from tkinter import ttk  # Themed widgets from tkinter
-import random  # For shuffling cards and random choices
-from collections import defaultdict  # For organizing data (though not used in current code)
+# Import the main tkinter library for creating the GUI
+import tkinter as tk
+# Import themed widgets from tkinter for better-looking buttons
+from tkinter import ttk
+# Import random module for shuffling cards and making random choices
+import random
+# Import defaultdict for creating dictionaries with default values (though not used in current code)
+from collections import defaultdict
 
+# Define a custom message box class that inherits from tkinter's Toplevel window
 class CustomMessageBox(tk.Toplevel):
-    """Custom dialog box class for displaying game messages"""
+    # Initialize the message box with parent window, title, message and type
     def __init__(self, parent, title, message, message_type="info"):
-        super().__init__(parent)  # Initialize parent class
+        # Call the parent class's initializer
+        super().__init__(parent)
         
-        # Set up the window properties
-        self.title(title)  # Set window title
-        self.geometry("400x200")  # Set window size
-        self.resizable(False, False)  # Disable window resizing
+        # Set the window title
+        self.title(title)
+        # Set the window size to 400x200 pixels
+        self.geometry("400x200")
+        # Disable window resizing in both directions
+        self.resizable(False, False)
         
-        # Define color scheme for different message types
+        # Define color scheme for different message types using hex color codes
         colors = {
-            "info": "#2196F3",    # Blue for information messages
-            "warning": "#FFA726",  # Orange for warnings
-            "error": "#EF5350",    # Red for errors
-            "success": "#66BB6A"   # Green for success messages
+            "info": "#2196F3",    # Blue color for information messages
+            "warning": "#FFA726",  # Orange color for warning messages
+            "error": "#EF5350",    # Red color for error messages
+            "success": "#66BB6A"   # Green color for success messages
         }
         
-        # Apply window styling
-        self.configure(bg='white')  # Set background color
-        self.color = colors.get(message_type, colors["info"])  # Get color based on message type
+        # Set the window background to white
+        self.configure(bg='white')
+        # Get the color based on message type, default to info color if type not found
+        self.color = colors.get(message_type, colors["info"])
         
-        # Create and arrange the window elements
+        # Create and set up all the widgets in the message box
         self.create_widgets(message)
         
-        # Make window modal (user must interact with it before continuing)
+        # Make the window modal (blocks interaction with parent window)
         self.transient(parent)
+        # Grab all events (force focus on this window)
         self.grab_set()
         
-        # Center the window on screen
+        # Center the window on the screen
         self.center_window()
 
     def create_widgets(self, message):
-        """Create and arrange all widgets in the message box"""
-        # Create colored header bar
+        # Create a colored header frame at the top of the message box
         header = tk.Frame(self, height=30, bg=self.color)
+        # Pack the header frame to fill horizontally with padding below
         header.pack(fill='x', pady=(0, 20))
         
-        # Create frame for message text
+        # Create a frame to contain the message text with white background
         msg_frame = tk.Frame(self, bg='white')
+        # Pack the message frame to expand and fill available space with padding
         msg_frame.pack(expand=True, fill='both', padx=20, pady=(0, 20))
         
-        # Create and configure message label
+        # Create a label to display the message text
         msg_label = tk.Label(
-            msg_frame,
-            text=message,
-            font=('Arial', 12),
-            wraplength=350,  # Wrap text if too long
-            bg='white'
+            msg_frame,            # Place label in the message frame
+            text=message,         # Set the message text
+            font=('Arial', 12),   # Use Arial font, size 12
+            wraplength=350,       # Wrap text if it exceeds 350 pixels
+            bg='white'           # White background to match frame
         )
+        # Pack the message label to expand and center in its frame
         msg_label.pack(expand=True)
         
-        # Create frame for buttons
+        # Create a frame for the OK button with white background
         btn_frame = tk.Frame(self, bg='white')
+        # Pack the button frame to fill horizontally with padding
         btn_frame.pack(fill='x', padx=20, pady=(0, 20))
         
-        # Configure button style
+        # Create a style configuration for the button
         style = ttk.Style()
+        # Configure custom button style with padding and font
         style.configure('Custom.TButton', 
-                       padding=10, 
-                       font=('Arial', 10))
+                       padding=10,           # Add padding around button text
+                       font=('Arial', 10))   # Set button font and size
         
-        # Create OK button
+        # Create the OK button with custom style
         ok_btn = ttk.Button(
-            btn_frame,
-            text="OK",
-            style='Custom.TButton',
-            command=self.destroy  # Close window when clicked
+            btn_frame,              # Place button in button frame
+            text="OK",             # Set button text
+            style='Custom.TButton', # Apply custom style
+            command=self.destroy    # Close window when clicked
         )
+        # Pack the button to the right side of its frame
         ok_btn.pack(side='right')
 
     def center_window(self):
-        """Center the message box on the screen"""
-        self.update_idletasks()  # Ensure window size is updated
+        # Update window's geometry information
+        self.update_idletasks()
         
-        # Get screen dimensions
+        # Get the screen's width and height
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         
-        # Calculate position for center of screen
-        x = (screen_width - self.winfo_width()) // 2
-        y = (screen_height - self.winfo_height()) // 2
+        # Calculate the x and y coordinates for the window to be centered
+        x = (screen_width - self.winfo_width()) // 2    # Center horizontally
+        y = (screen_height - self.winfo_height()) // 2  # Center vertically
         
-        # Set window position
-        self.geometry(f"+{x}+{y}")
+        # Set the window position using geometry string
+        self.geometry(f"+{x}+{y}")  # + prefix sets position instead of size
 
 class Card:
-    """Class representing a playing card with rank and suit"""
+    # Initialize a new card with a rank (2-A) and suit (Hearts, Diamonds, Clubs, Spades)
     def __init__(self, rank, suit):
-        self.rank = rank  # Card rank (2-10, J, Q, K, A)
-        self.suit = suit  # Card suit (Hearts, Diamonds, Clubs, Spades)
-        
+        # Store the card's rank (2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K, or A)
+        self.rank = rank
+        # Store the card's suit (Hearts, Diamonds, Clubs, or Spades)
+        self.suit = suit
+    
+    # Define string representation of the card (e.g., "2 of Hearts")
     def __str__(self):
-        """String representation of the card (e.g., '2 of Hearts')"""
+        # Return formatted string with rank and suit
         return f"{self.rank} of {self.suit}"
-        
+    
+    # Get the card's symbol representation (e.g., "2♥")
     def get_symbol(self):
-        """Returns card with unicode symbol (e.g., '2♥')"""
-        # Dictionary mapping suits to their unicode symbols
-        suit_symbols = {'Hearts': '♥', 'Diamonds': '♦', 'Clubs': '♣', 'Spades': '♠'}
+        # Dictionary mapping suit names to their unicode symbols
+        suit_symbols = {
+            'Hearts': '♥',    # Red heart symbol
+            'Diamonds': '♦',  # Red diamond symbol
+            'Clubs': '♣',     # Black club symbol
+            'Spades': '♠'     # Black spade symbol
+        }
+        # Return the card's rank followed by its suit symbol
         return f"{self.rank}{suit_symbols[self.suit]}"
 
 class BluffGameGUI:
-    """Main game class handling the GUI and game logic"""
+    # Initialize the main game window and set up the game
     def __init__(self, root):
-        self.root = root  # Store the main window reference
-        self.root.title("Bluff Card Game")  # Set window title
-        self.root.geometry("1024x768")  # Set initial window size
-        self.root.configure(bg='#1e4d2b')  # Set dark green background
+        # Store the root window reference
+        self.root = root
+        # Set the window title
+        self.root.title("Bluff Card Game")
+        # Set the initial window size
+        self.root.geometry("1024x768")
+        # Set the background color to dark green
+        self.root.configure(bg='#1e4d2b')
         
-        # Define card properties
-        self.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']  # All possible card ranks
-        self.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']  # All possible card suits
+        # Define all possible card ranks in order from lowest to highest
+        self.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        # Define all possible card suits (red suits first, then black suits)
+        self.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
         
-        # Initialize game components
-        self.setup_game()  # Set up initial game state
-        self.create_gui()  # Create the graphical interface
+        # Initialize the game state (deck, hands, etc.)
+        self.setup_game()
+        # Create and set up the graphical user interface
+        self.create_gui()
         
-        # Wait for window to render before updating display
+        # Wait for window to be rendered before updating display
         self.root.update()
+        # Draw the initial game state
         self.update_display()
         
-        # Bind window resize event to update display
+        # Bind the window resize event to update the display
         self.root.bind('<Configure>', lambda e: self.update_display())
 
     def setup_game(self):
-        """Initialize the game state and deal cards"""
-        # Create and shuffle deck
+        # Create a complete deck of 52 cards using list comprehension
+        # Creates one Card object for each combination of rank and suit
         self.deck = [Card(rank, suit) for rank in self.ranks for suit in self.suits]
+        # Randomly shuffle the deck of cards
         random.shuffle(self.deck)
         
-        # Initialize game variables
-        self.player_hand = []  # Player's cards
-        self.computer_hand = []  # Computer's cards
-        self.pile = []  # Cards played in the current round
-        self.current_rank = '2'  # Starting rank
-        self.selected_cards = set()  # Currently selected cards in GUI
+        # Initialize empty lists/sets for game components
+        self.player_hand = []      # List to store player's cards
+        self.computer_hand = []    # List to store computer's cards
+        self.pile = []            # List to store cards played in current round
+        self.current_rank = '2'    # Start game with rank of 2
+        self.selected_cards = set() # Set to track which cards player has selected
         
-        # Deal cards alternately to player and computer
+        # Deal cards alternately to player and computer until deck is empty
         while len(self.deck) > 0:
+            # Deal one card to player if deck isn't empty
             if len(self.deck) > 0:
                 self.player_hand.append(self.deck.pop())
+            # Deal one card to computer if deck isn't empty
             if len(self.deck) > 0:
                 self.computer_hand.append(self.deck.pop())
         
-        # Sort player's initial hand by rank and suit
+        # Sort player's initial hand by rank first, then by suit
+        # Uses lambda function to create sort key from rank and suit indices
         self.player_hand.sort(key=lambda card: (self.ranks.index(card.rank), self.suits.index(card.suit)))
 
     def create_gui(self):
-        """Create and arrange all graphical user interface elements"""
-        # Create top information frame
+        # Create main information frame at top of window
         self.info_frame = tk.Frame(self.root, bg='#1e4d2b')  # Dark green background
+        # Pack frame to fill horizontally with padding
         self.info_frame.pack(fill='x', pady=10, padx=20)
         
         # Create left section of info frame for current rank display
         self.info_left = tk.Frame(self.info_frame, bg='#1e4d2b')
+        # Pack frame to left side
         self.info_left.pack(side='left')
         
         # Create label showing current rank in play
         self.current_rank_label = tk.Label(
-            self.info_left,
-            text="Current Rank: 2",
-            font=('Arial Bold', 16),
-            bg='#1e4d2b',
-            fg='white'  # White text
+            self.info_left,           # Place in left info frame
+            text="Current Rank: 2",    # Initial text showing rank 2
+            font=('Arial Bold', 16),   # Bold Arial font, size 16
+            bg='#1e4d2b',             # Dark green background
+            fg='white'                # White text color
         )
+        # Pack the rank label
         self.current_rank_label.pack()
         
         # Create counter showing number of computer's cards (top right)
         self.computer_counter = tk.Label(
-            self.info_frame,
-            text="Computer's Cards: 26",
-            font=('Arial Bold', 16),
-            bg='#1e4d2b',
-            fg='white'
+            self.info_frame,                  # Place in info frame
+            text="Computer's Cards: 26",      # Initial text showing 26 cards
+            font=('Arial Bold', 16),          # Bold Arial font, size 16
+            bg='#1e4d2b',                    # Dark green background
+            fg='white'                       # White text color
         )
+        # Pack counter to right side
         self.computer_counter.pack(side='right')
         
-        # Create label for displaying game messages (e.g., "Computer calls bluff!")
+        # Create message label for displaying game notifications (e.g., "Computer calls bluff!")
         self.message_label = tk.Label(
-            self.root,
-            text="",
-            font=('Arial Bold', 16),
-            bg='#1e4d2b',
-            fg='#ff4444',  # Red text for visibility
-            wraplength=800  # Wrap text if too long
+            self.root,                # Place in main window
+            text="",                  # Initially empty
+            font=('Arial Bold', 16),  # Bold Arial font, size 16
+            bg='#1e4d2b',            # Dark green background to match window
+            fg='#ff4444',            # Red text color for visibility
+            wraplength=800           # Wrap text if longer than 800 pixels
         )
+        # Pack message label with vertical padding
         self.message_label.pack(pady=(0, 20))
         
-        # Create main frame for displaying cards
+        # Create frame for scrollable card display area
         self.scroll_frame = tk.Frame(self.root, bg='#1e4d2b')
+        # Pack frame to expand and fill available space with horizontal padding
         self.scroll_frame.pack(expand=True, fill='both', padx=20)
         
         # Create canvas for drawing cards
         self.cards_canvas = tk.Canvas(
-            self.scroll_frame, 
-            bg='#1e4d2b', 
-            height=430,  # Fixed height for card display area
-            highlightthickness=0  # Remove border
+            self.scroll_frame,        # Place in scroll frame
+            bg='#1e4d2b',            # Dark green background
+            height=430,              # Fixed height for card display
+            highlightthickness=0     # Remove canvas border
         )
+        # Pack canvas to expand and fill available space
         self.cards_canvas.pack(expand=True, fill='both')
         
         # Configure style for game buttons
         style = ttk.Style()
+        # Set custom button style with dark red theme
         style.configure('Game.TButton',
-                       padding=10,
-                       font=('Arial Bold', 12),
-                       background='#8B0000',  # Dark red
-                       foreground='white')
+                       padding=10,                # Add padding around button text
+                       font=('Arial Bold', 12),   # Bold Arial font, size 12
+                       background='#8B0000',      # Dark red background
+                       foreground='white')        # White text
         
-        # Create separator line between cards and menu bar
+        # Create black separator line between cards and menu bar
         separator = tk.Frame(self.root, height=2, bg='black')
+        # Pack separator at bottom of window
         separator.pack(side='bottom', fill='x')
         
         # Create bottom menu bar with dark red background
         self.menu_bar = tk.Frame(self.root, bg='#8B0000', height=150)
+        # Pack menu bar at bottom with fixed height
         self.menu_bar.pack(side='bottom', fill='x')
-        self.menu_bar.pack_propagate(False)  # Prevent size changes
+        # Prevent menu bar from resizing
+        self.menu_bar.pack_propagate(False)
         
-        # Create frame for selected cards counter (left side)
-        self.counter_frame = tk.Frame(self.menu_bar, bg='#8B0000')
+        # Create frame for selected cards counter on the left side
+        self.counter_frame = tk.Frame(self.menu_bar, bg='#8B0000')  # Dark red background
+        # Pack frame to left side with padding
         self.counter_frame.pack(side='left', padx=30)
         
-        # Create label showing number of selected cards
+        # Create label to show number of currently selected cards
         self.selected_count_label = tk.Label(
-            self.counter_frame,
-            text="Selected: 0",
-            font=('Arial Bold', 16),
-            bg='#8B0000',
-            fg='white'
+            self.counter_frame,        # Place in counter frame
+            text="Selected: 0",        # Initial text showing no cards selected
+            font=('Arial Bold', 16),   # Bold Arial font, size 16
+            bg='#8B0000',             # Dark red background
+            fg='white'                # White text color
         )
+        # Pack the selected count label
         self.selected_count_label.pack()
         
-        # Create frame for player's cards counter (right side)
+        # Create frame for player's cards counter on the right side
         self.your_cards_frame = tk.Frame(self.menu_bar, bg='#8B0000')
+        # Pack frame to right side with padding
         self.your_cards_frame.pack(side='right', padx=30)
         
-        # Create label showing number of player's cards
+        # Create label to show number of cards in player's hand
         self.your_cards_label = tk.Label(
-            self.your_cards_frame,
-            text="Your Cards: 26",
-            font=('Arial Bold', 16),
-            bg='#8B0000',
-            fg='white'
+            self.your_cards_frame,     # Place in cards frame
+            text="Your Cards: 26",     # Initial text showing 26 cards
+            font=('Arial Bold', 16),   # Bold Arial font, size 16
+            bg='#8B0000',             # Dark red background
+            fg='white'                # White text color
         )
+        # Pack the cards count label
         self.your_cards_label.pack()
         
-        # Create center button frame for main game controls
+        # Create center frame for main game buttons
         self.button_frame = tk.Frame(self.menu_bar, bg='#8B0000')
+        # Pack frame to expand and fill remaining space
         self.button_frame.pack(expand=True, fill='both')
         
-        # Create container for buttons with fixed height to ensure proper centering
+        # Create container to center buttons vertically
         button_container = tk.Frame(self.button_frame, bg='#8B0000', height=150)
+        # Pack container to fill space
         button_container.pack(expand=True, fill='both')
-        button_container.pack_propagate(False)  # Prevent container from shrinking to fit content
+        # Prevent container from shrinking to fit content
+        button_container.pack_propagate(False)
         
         # Create inner frame for precise button positioning
         inner_button_frame = tk.Frame(button_container, bg='#8B0000')
-        # Place frame exactly in center using relative coordinates (0.5 = middle)
+        # Place frame exactly in center of container
         inner_button_frame.place(relx=0.5, rely=0.5, anchor='center')
         
         # Create main "Play Cards" button with custom styling
         self.play_button = tk.Button(
-            inner_button_frame,
-            text="Play Cards",
-            font=('Arial Bold', 20),  # Large, bold font for visibility
-            bg='white',  # White background
-            fg='black',  # Black text
+            inner_button_frame,          # Place in centered inner frame
+            text="Play Cards",           # Button text
+            font=('Arial Bold', 20),     # Large bold font for visibility
+            bg='white',                  # White background
+            fg='black',                  # Black text
             activebackground='#e0e0e0',  # Slightly darker when clicked
             activeforeground='black',    # Text stays black when clicked
-            relief='raised',  # 3D effect for button
-            borderwidth=3,    # Thick border for better visibility
-            padx=50,  # Horizontal padding
-            pady=20,  # Vertical padding
-            command=self.play_cards  # Method called when button is clicked
+            relief='raised',             # 3D effect for button
+            borderwidth=3,               # Thick border for better visibility
+            padx=50,                     # Horizontal internal padding
+            pady=20,                     # Vertical internal padding
+            command=self.play_cards      # Function to call when clicked
         )
-        self.play_button.pack(side=tk.LEFT, padx=50)  # Pack to left with spacing
+        # Pack play button to the left with spacing
+        self.play_button.pack(side=tk.LEFT, padx=50)
         
         # Create "Call Bluff" button with matching styling
         self.call_bluff_button = tk.Button(
-            inner_button_frame,
-            text="Call Bluff",
-            font=('Arial Bold', 20),
-            bg='white',
-            fg='black',
-            activebackground='#e0e0e0',
-            activeforeground='black',
-            relief='raised',
-            borderwidth=3,
-            padx=50,
-            pady=20,
-            command=self.call_bluff  # Method called to challenge opponent's play
+            inner_button_frame,          # Place in centered inner frame
+            text="Call Bluff",           # Button text
+            font=('Arial Bold', 20),     # Large bold font
+            bg='white',                  # White background
+            fg='black',                  # Black text
+            activebackground='#e0e0e0',  # Slightly darker when clicked
+            activeforeground='black',    # Text stays black when clicked
+            relief='raised',             # 3D effect
+            borderwidth=3,               # Thick border
+            padx=50,                     # Horizontal padding
+            pady=20,                     # Vertical padding
+            command=self.call_bluff      # Function to call when clicked
         )
+        # Pack bluff button to the left of play button with spacing
         self.call_bluff_button.pack(side=tk.LEFT, padx=50)
         
-        # Add hover effects to both buttons using event bindings
-        # Lambda functions are used to pass both the event and button reference
+        # Add hover effects to both game buttons
         for button in (self.play_button, self.call_bluff_button):
-            # <Enter> event occurs when mouse enters button area
-            button.bind('<Enter>', lambda e, b=button: b.configure(bg='#e0e0e0'))
-            # <Leave> event occurs when mouse leaves button area
-            button.bind('<Leave>', lambda e, b=button: b.configure(bg='white'))
+            # Bind mouse enter event to change background color
+            button.bind('<Enter>', 
+                       lambda e, b=button: b.configure(bg='#e0e0e0'))  # Darken when hovered
+            # Bind mouse leave event to restore original color
+            button.bind('<Leave>', 
+                       lambda e, b=button: b.configure(bg='white'))    # Return to white when mouse leaves
         
-        # Bind left mouse click on canvas to card selection handler
+        # Bind left mouse click on canvas to handle card selection
         self.cards_canvas.bind('<Button-1>', self.on_card_click)
 
     def show_message(self, title, message, message_type="info"):
-        """Display a temporary game message to the player
+        """Display a temporary message in the game interface
         
         Args:
-            title (str): Message title (not currently displayed in message label)
+            title (str): Message title (unused in current implementation)
             message (str): The message to display
-            message_type (str): Type of message - affects styling (not currently used in message label)
+            message_type (str): Type of message for styling (unused in current implementation)
         """
-        # Update message label with new text
+        # Update the message label with new text
         self.message_label.config(text=message)
-        # Force update to ensure message is displayed immediately
+        # Force update to show message immediately
         self.root.update()
         # Schedule message removal after 3 seconds (3000 milliseconds)
         self.root.after(3000, lambda: self.message_label.config(text=""))
 
     def update_display(self):
-        """Update the game display and redraw all cards
-        
-        This method handles:
-        1. Updating all counter labels
-        2. Calculating card layout based on window size
-        3. Drawing cards in a responsive grid layout
-        4. Handling card selection highlighting
-        5. Adding click detection areas
-        
-        The cards are drawn in rows, automatically adjusting based on window width.
-        Each card shows its rank and suit with appropriate coloring and selection state.
-        """
         # Update all counter labels with current game state
         self.your_cards_label.config(text=f"Your Cards: {len(self.player_hand)}")
         self.computer_counter.config(text=f"Computer's Cards: {len(self.computer_hand)}")
         self.current_rank_label.config(text=f"Current Rank: {self.current_rank}")
         
-        # Clear the canvas before redrawing
+        # Clear the entire canvas before redrawing
         self.cards_canvas.delete('all')
         
-        # Define card dimensions and spacing
-        card_width = 80  # Width of each card in pixels
+        # Define fixed dimensions for card display
+        card_width = 80    # Width of each card in pixels
         card_height = 120  # Height of each card in pixels
-        spacing = 10  # Horizontal space between cards
-        padding = 20  # Padding from canvas edges
+        spacing = 10      # Horizontal space between cards
+        padding = 20      # Padding from canvas edges
         
-        # Calculate layout based on window size
+        # Calculate how many cards can fit in one row based on window width
         window_width = self.cards_canvas.winfo_width()
-        # Determine maximum cards that can fit in one row
+        # Ensure at least 1 card per row, otherwise calculate maximum that fit
         cards_per_row = max(1, (window_width - padding) // (card_width + spacing))
         
-        # Calculate number of rows needed
+        # Calculate how many rows are needed to display all cards
         num_cards = len(self.player_hand)
+        # Use integer division and round up to get number of rows
         num_rows = (num_cards + cards_per_row - 1) // cards_per_row
         
-        # Calculate starting position to center cards horizontally
+        # Calculate starting x position to center cards horizontally
+        # Use minimum of cards_per_row and actual number of cards to handle last row
         total_width = min(cards_per_row, num_cards) * (card_width + spacing) - spacing
         x_start = (window_width - total_width) / 2
         
-        # Calculate vertical positioning
+        # Calculate vertical spacing and positioning
         row_spacing = card_height + 20  # Vertical space between rows
-        total_height = num_rows * row_spacing - 20
-        y_start = (430 - total_height) / 2  # Center vertically in canvas
+        total_height = num_rows * row_spacing - 20  # Total height needed
+        # Center cards vertically in the 430px high canvas
+        y_start = (430 - total_height) / 2
         
-        # Draw each card
+        # Draw each card in the player's hand
         for i, card in enumerate(self.player_hand):
-            # Calculate card position in grid
-            row = i // cards_per_row  # Determine which row
-            col = i % cards_per_row   # Determine position in row
-            x = x_start + col * (card_width + spacing)  # Calculate x position
-            y = y_start + row * row_spacing            # Calculate y position
+            # Calculate row and column position for this card
+            row = i // cards_per_row  # Integer division for row number
+            col = i % cards_per_row   # Remainder for column position
             
-            # Draw card background with selection state
+            # Calculate pixel coordinates for card placement
+            x = x_start + col * (card_width + spacing)  # X position in grid
+            y = y_start + row * row_spacing            # Y position in grid
+            
+            # Draw card background rectangle
+            # Use grey for selected cards, white for unselected
             color = '#e0e0e0' if i in self.selected_cards else 'white'
             self.cards_canvas.create_rectangle(
-                x, y,
-                x + card_width, y + card_height,
-                fill=color, outline='black', width=2
+                x, y,                          # Top-left corner
+                x + card_width, y + card_height, # Bottom-right corner
+                fill=color,                     # Background color
+                outline='black',                # Border color
+                width=2                         # Border width
             )
             
-            # Add green highlight border for selected cards
+            # Add highlight border for selected cards
             if i in self.selected_cards:
                 self.cards_canvas.create_rectangle(
-                    x + 2, y + 2,
-                    x + card_width - 2, y + card_height - 2,
-                    outline='#4CAF50',  # Green highlight color
-                    width=3
+                    x + 2, y + 2,                    # Top-left corner (inset by 2 pixels)
+                    x + card_width - 2, y + card_height - 2,  # Bottom-right corner (inset by 2 pixels)
+                    outline='#4CAF50',               # Green highlight color
+                    width=3                          # Thick highlight border
                 )
             
-            # Draw card symbol with appropriate color
-            text_color = 'red' if card.suit in ['Hearts', 'Diamonds'] else 'black'
-            font_size = 20  # Size of card text
+            # Draw card symbol (e.g., "2♥") on the card
+            text_color = 'red' if card.suit in ['Hearts', 'Diamonds'] else 'black'  # Red for hearts/diamonds
+            font_size = 20  # Fixed font size for card symbols
             self.cards_canvas.create_text(
-                x + card_width/2,  # Center text horizontally
-                y + card_height/2, # Center text vertically
-                text=card.get_symbol(),
-                font=('Arial', font_size),
-                fill=text_color
+                x + card_width/2,                    # Center horizontally in card
+                y + card_height/2,                   # Center vertically in card
+                text=card.get_symbol(),              # Get card's symbol representation
+                font=('Arial', font_size),           # Arial font with fixed size
+                fill=text_color                      # Red or black based on suit
             )
             
             # Create invisible rectangle for click detection
-            # Tagged with card index for selection handling
             self.cards_canvas.create_rectangle(
-                x, y,
-                x + card_width, y + card_height,
-                tags=f'card_{i}',
-                outline=''  # Invisible outline
+                x, y,                               # Top-left corner
+                x + card_width, y + card_height,    # Bottom-right corner
+                tags=f'card_{i}',                   # Tag with card index for identification
+                outline=''                          # Invisible outline
             )
 
     def on_card_click(self, event):
         """Handle mouse clicks on cards in the play area
         
         Args:
-            event: The mouse click event containing coordinates
-        
-        This method handles card selection/deselection when clicked and updates the UI accordingly.
-        Cards can be selected multiple times to toggle their selection state.
+            event: The mouse click event containing x,y coordinates
         """
-        # Convert canvas coordinates to scrolled coordinates (in case of future scrolling implementation)
+        # Convert canvas coordinates to scrolled coordinates (for future scrolling implementation)
         canvas_x = self.cards_canvas.canvasx(event.x)
         canvas_y = event.y
         
@@ -444,92 +490,83 @@ class BluffGameGUI:
                     if card_index in self.selected_cards:
                         self.selected_cards.remove(card_index)  # Deselect if already selected
                     else:
-                        self.selected_cards.add(card_index)  # Select if not selected
+                        self.selected_cards.add(card_index)     # Select if not selected
                     
-                    # Update the selection counter in the UI
+                    # Update the selected count label
                     self.selected_count_label.config(text=f"Selected: {len(self.selected_cards)}")
                     # Redraw the cards to show updated selection state
                     self.update_display()
                     return  # Exit after handling the topmost card
 
     def play_cards(self):
-        """Handle the player's attempt to play cards
+        """Handle player's attempt to play cards
         
-        This method is called when the player clicks the "Play Cards" button.
-        It validates the play, adds cards to the pile, and handles the computer's response.
-        
-        Game Rules:
-        - Players must select at least one card to play
-        - Cards played must match the current rank (or player can bluff)
-        - Computer may call bluff after cards are played
+        Validates the play, adds cards to the pile, and handles computer's response.
+        Cards are removed from player's hand and added to the play pile.
+        Computer may call bluff after cards are played.
         """
-        # Validate that cards are selected
+        # Check if any cards are selected to play
         if not self.selected_cards:
             self.show_message("Error", "Please select cards to play!")
             return
             
         # Get the selected cards and remove them from player's hand
+        # Sort in reverse order to avoid index issues when removing multiple cards
         cards_to_play = [self.player_hand[i] for i in sorted(self.selected_cards, reverse=True)]
         for card in cards_to_play:
-            self.player_hand.remove(card)  # Remove from hand
-            self.pile.append(card)  # Add to play pile
+            self.player_hand.remove(card)  # Remove card from player's hand
+            self.pile.append(card)         # Add card to the play pile
         
-        # Clear the selection after playing
+        # Clear the selection after playing cards
         self.selected_cards.clear()
         
-        # Sort remaining cards for better organization
+        # Sort remaining cards in player's hand by rank and suit
         self.player_hand.sort(key=lambda card: (self.ranks.index(card.rank), self.suits.index(card.suit)))
         
         # Let computer decide whether to call bluff
         if self.computer_decide_bluff(len(cards_to_play)):
+            # Computer decides to call bluff
             self.show_message("Bluff Called!", "Computer calls BLUFF!")
-            
-            # Check if player was actually bluffing
+            # Check if any played cards don't match the current rank
             bluff_called = any(card.rank != self.current_rank for card in cards_to_play)
             
             if bluff_called:
-                # Player was caught bluffing
+                # Player was caught bluffing - must take all cards
                 self.show_message("Caught!", "You were caught bluffing! Taking the pile...")
-                self.player_hand.extend(self.pile)  # Player must take all cards
+                self.player_hand.extend(self.pile)
             else:
-                # Computer was wrong
+                # Computer was wrong - must take all cards
                 self.show_message("Wrong!", "Computer was wrong! They take the pile...")
-                self.computer_hand.extend(self.pile)  # Computer must take all cards
-            
-            self.pile = []  # Clear the pile
-            self.next_rank()  # Advance to next rank only after pile is taken
+                self.computer_hand.extend(self.pile)
+            # Clear the pile after cards are taken
+            self.pile = []
+            # Advance to next rank only after pile is taken
+            self.next_rank()
         
         # Computer takes their turn
         self.computer_turn()
-        
-        # Update the display to reflect changes
+        # Update the display to reflect all changes
         self.update_display()
-        
         # Check if game is over after play
         self.check_game_over()
 
     def computer_decide_bluff(self, num_cards_claimed):
-        """Determine if the computer should call the player's bluff
+        """Determine if computer should call player's bluff
         
         Args:
-            num_cards_claimed (int): Number of cards the player claims to be playing
+            num_cards_claimed (int): Number of cards player claims to be playing
             
         Returns:
             bool: True if computer decides to call bluff, False otherwise
-            
-        Strategy:
-        1. Calculate how many cards of current rank could exist outside computer's hand
-        2. Call bluff if player claims more cards than possible
-        3. Increase chance of calling bluff for larger plays
         """
         # Threshold for random bluff calling (70% chance to let it pass)
         probability_threshold = 0.7
         
-        # Count how many cards of the current rank computer has
+        # Count how many cards of current rank computer has
         cards_of_rank = len([card for card in self.computer_hand if card.rank == self.current_rank])
         
         # Calculate maximum possible cards player could have of this rank
-        # (4 cards per rank in a deck - cards computer has)
+        # (4 cards per rank in deck - cards computer has)
         total_possible = 4 - cards_of_rank
         
         # Always call bluff if player claims more cards than possible
@@ -538,214 +575,233 @@ class BluffGameGUI:
         # Randomly call bluff on larger plays (3+ cards) with 30% chance
         elif num_cards_claimed > 2 and random.random() > probability_threshold:
             return True
+        # Otherwise, accept the play
         return False
 
     def computer_turn(self):
-        """Handle the computer's turn
+        """Handle the computer's turn in the game
+        
+        Computer will either:
+        1. Play matching cards if it has them
+        2. Bluff with random cards if it has no matching cards
         
         Returns:
             bool: True if computer is bluffing, False if playing honestly
-            
-        Strategy:
-        1. Play matching cards if available
-        2. Bluff with random cards if no matching cards
-        3. Limit bluff plays to 3 cards maximum
         """
-        # Find all cards in computer's hand matching current rank
+        # Find all cards in computer's hand that match the current rank
         cards_of_rank = [card for card in self.computer_hand if card.rank == self.current_rank]
         
         if cards_of_rank:
-            # If computer has matching cards, play 1 to all of them
+            # If computer has matching cards, randomly choose how many to play
             num_to_play = random.randint(1, len(cards_of_rank))
+            # Take the first n cards from matching cards
             cards_to_play = cards_of_rank[:num_to_play]
-            bluffing = False  # Playing honestly
+            bluffing = False  # Not bluffing since playing matching cards
         else:
             # If no matching cards, bluff with 1-3 random cards
             num_to_play = random.randint(1, min(3, len(self.computer_hand)))
+            # Randomly select cards to bluff with
             cards_to_play = random.sample(self.computer_hand, num_to_play)
-            bluffing = True  # Playing a bluff
+            bluffing = True   # Playing non-matching cards, so bluffing
         
-        # Remove played cards from hand and add to pile
+        # Remove played cards from computer's hand and add to pile
         for card in cards_to_play:
-            self.computer_hand.remove(card)
-            self.pile.append(card)
+            self.computer_hand.remove(card)  # Remove from hand
+            self.pile.append(card)          # Add to play pile
         
-        # Notify player of computer's play
+        # Show message about computer's play
         self.show_message(
             "Computer's Turn",
             f"Computer plays {num_to_play} card(s) of rank {self.current_rank}"
         )
         
-        # Update display to reflect changes
+        # Update display to show new game state
         self.update_display()
+        # Return whether computer was bluffing
         return bluffing
 
     def call_bluff(self):
         """Handle player's attempt to call computer's bluff
         
-        Game Rules:
-        1. Can't call bluff if no cards in pile
-        2. Only the most recent play can be challenged
-        3. If bluff called correctly, computer takes pile
-        4. If bluff called wrongly, player takes pile
-        5. Rank advances after pile is taken
+        Checks if the computer's last play was honest:
+        - If computer was bluffing, computer takes the pile
+        - If computer was honest, player takes the pile
         """
         # Validate there are cards to call bluff on
         if len(self.pile) == 0:
             self.show_message("Error", "No cards in the pile to call bluff on!")
             return
-        
-        # Check the last played card(s)
+            
+        # Get the last card(s) played
         last_cards = self.pile[-1]
-        # Determine if the computer was bluffing
+        # Check if any of the last played cards don't match current rank
         if any(card.rank != self.current_rank for card in [last_cards]):
             # Computer was caught bluffing
             self.show_message(
                 "Caught!",
                 "You caught the computer bluffing! Computer takes the pile..."
             )
-            self.computer_hand.extend(self.pile)  # Computer takes all cards
+            # Computer must take all cards in the pile
+            self.computer_hand.extend(self.pile)
         else:
-            # Computer was honest
+            # Computer was playing honestly
             self.show_message(
                 "Wrong!",
                 "Computer was honest! You take the pile..."
             )
-            self.player_hand.extend(self.pile)  # Player takes all cards
+            # Player must take all cards in the pile
+            self.player_hand.extend(self.pile)
             
-        # Clear the pile and advance to next rank
+        # Clear the pile after cards are taken
         self.pile = []
-        self.next_rank()  # Advance rank after pile is taken
+        # Advance to next rank after pile is taken
+        self.next_rank()
         
-        # Update display and check for game end
+        # Update display to show new game state
         self.update_display()
+        # Check if game is over after play
         self.check_game_over()
 
     def next_rank(self):
         """Advance to the next rank in the sequence
         
-        The rank sequence goes from 2 through 10, then J, Q, K, A.
-        After A, it wraps back to 2.
+        Moves to the next rank in order (2->3->4->...->K->A->2)
+        Uses modulo to wrap around to beginning when reaching the end
         """
-        # Find the index of current rank in the ranks list
+        # Find the current rank's position in the ranks list
         current_index = self.ranks.index(self.current_rank)
-        # Calculate next rank using modulo to wrap around to start
+        # Set current_rank to next rank, wrapping around to start if at end
         self.current_rank = self.ranks[(current_index + 1) % len(self.ranks)]
 
     def check_game_over(self):
         """Check if either player has won the game
         
-        Win condition: A player wins when they have no cards left in their hand.
-        This method creates the appropriate GameOverScreen when a winner is determined.
+        Win condition: A player wins when they have no cards left
+        Creates appropriate GameOverScreen when game ends
         """
+        # Player wins if they have no cards
         if len(self.player_hand) == 0:
-            # Player wins if they have no cards
             GameOverScreen(self.root, "Congratulations! You win!")
+        # Computer wins if it has no cards
         elif len(self.computer_hand) == 0:
-            # Computer wins if it has no cards
             GameOverScreen(self.root, "Computer wins! Better luck next time!")
 
 class GameOverScreen(tk.Toplevel):
-    """A modal window displayed when the game ends
+    """Modal window displayed when game ends
     
-    This window shows the game result and provides options to play again or quit.
-    It appears centered on top of the main game window.
+    Shows game result and provides options to:
+    1. Play again (starts new game)
+    2. Quit (closes application)
     """
     def __init__(self, parent, message):
+        # Initialize parent class (Toplevel window)
         super().__init__(parent)
         
         # Configure window properties
-        self.title("Game Over")  # Window title
-        self.geometry("400x300")  # Fixed window size
-        self.resizable(False, False)  # Prevent window resizing
-        self.configure(bg='#1e4d2b')  # Match main game's green background
+        self.title("Game Over")           # Set window title
+        self.geometry("400x300")          # Set window size
+        self.resizable(False, False)      # Prevent window resizing
+        self.configure(bg='#1e4d2b')      # Set dark green background
         
         # Make window modal (blocks interaction with main window)
         self.transient(parent)
         self.grab_set()
         
-        # Create and configure the "GAME OVER" header
+        # Create "GAME OVER" header label
+        tk.Label(
+            self,                         # Place in this window
+            text="GAME OVER",             # Header text
+            font=('Arial Bold', 24),      # Large bold font
+            bg='#1e4d2b',                # Match window background
+            fg='white'                    # White text color
+        ).pack(pady=20)
+        
+        # Create result message label
         tk.Label(
             self,
-            text="GAME OVER",
-            font=('Arial Bold', 24),
-            bg='#1e4d2b',
-            fg='white'  # White text for contrast
+            text=message,                 # Win/lose message
+            font=('Arial', 16),           # Medium size font
+            bg='#1e4d2b',                # Match window background
+            fg='white',                   # White text color
+            wraplength=350               # Wrap text if too long
         ).pack(pady=20)
         
-        # Create and configure the result message
-        tk.Label(
-            self,
-            text=message,
-            font=('Arial', 16),
-            bg='#1e4d2b',
-            fg='white',
-            wraplength=350  # Wrap text if too long
-        ).pack(pady=20)
-        
-        # Create "Play Again" button with bright styling
+        # Create "Play Again" button
         tk.Button(
             self,
-            text="Play Again",
-            font=('Arial Bold', 14),
-            bg='white',
-            fg='black',
-            command=self.play_again,  # Method to restart game
-            padx=20,
-            pady=10
+            text="Play Again",            # Button text
+            font=('Arial Bold', 14),      # Bold font
+            bg='white',                   # White background
+            fg='black',                   # Black text
+            command=self.play_again,      # Method to call when clicked
+            padx=20,                      # Horizontal padding
+            pady=10                       # Vertical padding
         ).pack(pady=20)
         
-        # Create "Quit" button with dark red styling
+        # Create "Quit" button
         tk.Button(
             self,
-            text="Quit",
-            font=('Arial Bold', 14),
-            bg='#8B0000',  # Dark red background
-            fg='white',    # White text
-            command=self.quit_game,  # Method to exit game
-            padx=20,
-            pady=10
+            text="Quit",                  # Button text
+            font=('Arial Bold', 14),      # Bold font
+            bg='#8B0000',                # Dark red background
+            fg='white',                   # White text
+            command=self.quit_game,       # Method to call when clicked
+            padx=20,                      # Horizontal padding
+            pady=10                       # Vertical padding
         ).pack(pady=10)
         
-        # Center the window on screen
+        # Center window on screen
         self.center_window()
     
     def center_window(self):
-        """Center the game over window on the screen"""
-        self.update_idletasks()  # Ensure window size is updated
+        """Center the game over window on the screen
         
-        # Get screen dimensions
+        Calculates the position to place window in center of screen
+        based on screen dimensions and window size
+        """
+        # Update window's geometry information before calculating position
+        self.update_idletasks()
+        
+        # Get the screen dimensions
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         
         # Calculate center position
-        x = (screen_width - self.winfo_width()) // 2
-        y = (screen_height - self.winfo_height()) // 2
+        x = (screen_width - self.winfo_width()) // 2   # Center horizontally
+        y = (screen_height - self.winfo_height()) // 2  # Center vertically
         
-        # Set window position
-        self.geometry(f"+{x}+{y}")
+        # Set window position using geometry string
+        self.geometry(f"+{x}+{y}")  # + prefix sets position instead of size
     
     def play_again(self):
-        """Handle the "Play Again" button click
+        """Handle the Play Again button click
         
-        This method:
-        1. Quits the current game instance
-        2. Creates a new game instance
-        3. Closes the game over screen
+        Closes current game and starts a new game instance:
+        1. Quits current game
+        2. Creates new game instance
+        3. Closes game over screen
         """
-        self.master.quit()  # Quit current game
-        game = BluffGameGUI(self.master)  # Create new game
-        self.destroy()  # Close game over screen
+        # Quit the current game instance
+        self.master.quit()
+        # Create a new game instance with same root window
+        game = BluffGameGUI(self.master)
+        # Close the game over screen
+        self.destroy()
     
     def quit_game(self):
-        """Handle the "Quit" button click
+        """Handle the Quit button click
         
-        Exits the game completely by quitting the main window
+        Exits the game completely by closing the main window
         """
-        self.master.quit()  # Quit the entire game
+        # Quit the entire application
+        self.master.quit()
 
-# Entry point of the program
+# Program entry point
 if __name__ == "__main__":
-    root = tk.Tk()  # Create the main window
-    game = BluffGameGUI(root)  # Create game instance
-    root.mainloop()  # Start the game loop
+    # Create the main application window
+    root = tk.Tk()
+    # Create the game instance
+    game = BluffGameGUI(root)
+    # Start the main event loop
+    # This blocks until the window is closed
+    root.mainloop()
