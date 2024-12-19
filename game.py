@@ -104,6 +104,11 @@ class BluffGameGUI:
         self.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
         self.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
         
+        # Add tracking for player behavior
+        self.player_bluff_history = []  # Track if player was caught bluffing
+        self.player_aggression = 0  # Track how many cards player typically plays
+        self.successful_bluffs = 0  # Track computer's successful bluffs
+        
         self.setup_game()
         self.create_gui()
         
@@ -422,38 +427,124 @@ class BluffGameGUI:
         self.check_game_over()
 
     def computer_decide_bluff(self, num_cards_claimed):
-        probability_threshold = 0.7
+        # Count cards of current rank computer can see
         cards_of_rank = len([card for card in self.computer_hand if card.rank == self.current_rank])
         total_possible = 4 - cards_of_rank
         
+        # Calculate bluff probability based on multiple factors
+        bluff_probability = 0.0
+        
+        # Factor 1: Mathematical impossibility
         if num_cards_claimed > total_possible:
             return True
-        elif num_cards_claimed > 2 and random.random() > probability_threshold:
-            return True
-        return False
+            
+        # Factor 2: Player's historical aggression
+        if self.player_aggression > 0:
+            avg_cards_played = self.player_aggression / max(1, len(self.player_bluff_history))
+            if num_cards_claimed > avg_cards_played * 1.5:
+                bluff_probability += 0.3
+        
+        # Factor 3: Stage of the game
+        cards_left_ratio = len(self.player_hand) / 26  # 26 is starting hand size
+        if cards_left_ratio < 0.3:  # End game
+            bluff_probability += 0.2  # More aggressive in endgame
+        
+        # Factor 4: Number of cards claimed
+        bluff_probability += num_cards_claimed * 0.15  # Each card increases probability
+        
+        # Factor 5: Recent player behavior
+        if len(self.player_bluff_history) >= 3:
+            recent_bluffs = sum(self.player_bluff_history[-3:])
+            if recent_bluffs >= 2:  # Player caught bluffing recently
+                bluff_probability += 0.2
+        
+        # Add some randomness
+        bluff_probability += random.uniform(-0.1, 0.1)
+        
+        # Decision
+        return random.random() < bluff_probability
 
     def computer_turn(self):
         cards_of_rank = [card for card in self.computer_hand if card.rank == self.current_rank]
-        if cards_of_rank:
-            num_to_play = random.randint(1, len(cards_of_rank))
-            cards_to_play = cards_of_rank[:num_to_play]
-            bluffing = False
-        else:
-            num_to_play = random.randint(1, min(3, len(self.computer_hand)))
-            cards_to_play = random.sample(self.computer_hand, num_to_play)
-            bluffing = True
+        bluffing = False
         
+        # Decide whether to bluff based on game state
+        should_bluff = self.decide_if_should_bluff()
+        
+        if cards_of_rank and not should_bluff:
+            # Play honestly
+            num_to_play = self.decide_num_cards_to_play(len(cards_of_rank), False)
+            cards_to_play = cards_of_rank[:num_to_play]
+        else:
+            # Bluff
+            bluffing = True
+            num_to_play = self.decide_num_cards_to_play(len(self.computer_hand), True)
+            # Try to play cards that are close to the current rank if possible
+            cards_to_play = self.select_bluff_cards(num_to_play)
+        
+        # Play the selected cards
         for card in cards_to_play:
             self.computer_hand.remove(card)
             self.pile.append(card)
         
         self.show_message(
             "Computer's Turn",
-            f"Computer plays {num_to_play} card(s) of rank {self.current_rank}"
+            f"Computer plays {len(cards_to_play)} card(s) of rank {self.current_rank}"
         )
-        # Removed self.next_rank() from here
-        self.update_display()
+        
         return bluffing
+
+    def decide_if_should_bluff(self):
+        # Decide whether to bluff even with correct cards
+        if len(self.computer_hand) < 5:  # Endgame strategy
+            return random.random() < 0.3
+        
+        if self.successful_bluffs > 0:  # More confident if successful before
+            return random.random() < 0.2
+            
+        return random.random() < 0.1  # Base bluff chance
+
+    def decide_num_cards_to_play(self, max_cards, is_bluffing):
+        if is_bluffing:
+            # More conservative when bluffing
+            if len(self.computer_hand) < 5:  # Endgame
+                return 1  # Play it safe near the end
+            elif self.successful_bluffs > 2:
+                return random.randint(1, min(3, max_cards))  # More confident
+            else:
+                return random.randint(1, min(2, max_cards))  # Conservative
+        else:
+            # More aggressive when playing honestly
+            if len(self.computer_hand) < 5:  # Endgame
+                return max_cards  # Try to win quickly
+            else:
+                return random.randint(max(1, max_cards-1), max_cards)
+
+    def select_bluff_cards(self, num_cards):
+        # Try to play cards close to the current rank to be more believable
+        current_rank_idx = self.ranks.index(self.current_rank)
+        
+        # Group cards by how close they are to current rank
+        cards_by_distance = defaultdict(list)
+        for card in self.computer_hand:
+            distance = abs(self.ranks.index(card.rank) - current_rank_idx)
+            cards_by_distance[distance].append(card)
+        
+        # Select cards preferring those closer to current rank
+        selected_cards = []
+        distances = sorted(cards_by_distance.keys())
+        
+        for distance in distances:
+            available_cards = cards_by_distance[distance]
+            while available_cards and len(selected_cards) < num_cards:
+                card = random.choice(available_cards)
+                selected_cards.append(card)
+                available_cards.remove(card)
+                
+            if len(selected_cards) == num_cards:
+                break
+                
+        return selected_cards
 
     def call_bluff(self):
         if len(self.pile) == 0:
@@ -484,10 +575,14 @@ class BluffGameGUI:
         self.current_rank = self.ranks[(current_index + 1) % len(self.ranks)]
 
     def check_game_over(self):
-        if len(self.player_hand) == 0:
-            GameOverScreen(self.root, "Congratulations! You win!")
-        elif len(self.computer_hand) == 0:
-            GameOverScreen(self.root, "Computer wins! Better luck next time!")
+        if len(self.player_hand) == 0 or len(self.computer_hand) == 0:
+            # Update display one last time to show final state
+            self.update_display()
+            
+            message = "Congratulations! You win!" if len(self.player_hand) == 0 else "Computer wins! Better luck next time!"
+            
+            # Create game over screen after a short delay to ensure final state is visible
+            self.root.after(1000, lambda: GameOverScreen(self.root, message))
 
 class GameOverScreen(tk.Toplevel):
     def __init__(self, parent, message):
@@ -557,15 +652,18 @@ class GameOverScreen(tk.Toplevel):
         self.geometry(f"+{x}+{y}")
     
     def play_again(self):
-        # Since master is the root window, we can directly quit
-        self.master.quit()
-        # Create a new game instance
-        game = BluffGameGUI(self.master)
+        # Destroy old game elements
+        for widget in self.master.winfo_children():
+            widget.destroy()
+        
+        # Create new game
+        BluffGameGUI(self.master)
+        
+        # Close game over screen
         self.destroy()
     
     def quit_game(self):
-        # Since master is the root window, we can directly quit
-        self.master.quit()
+        self.master.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
