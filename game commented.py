@@ -847,4 +847,3 @@ if __name__ == "__main__":
     # Start the main event loop
     # This blocks until the window is closed
     root.mainloop()
-    
