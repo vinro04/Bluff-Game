@@ -72,7 +72,7 @@ class CustomMessageBox(tk.Toplevel):
         }
         
         # Set the window background to white
-        self.configure(bg='white')
+        self.configure(bg="white")
         # Get the color based on message type, default to info color if type not found
         self.color = colors.get(message_type, colors["info"])
         
@@ -91,45 +91,45 @@ class CustomMessageBox(tk.Toplevel):
         # Create a colored header frame at the top of the message box
         header = tk.Frame(self, height=30, bg=self.color)
         # Pack the header frame to fill horizontally with padding below
-        header.pack(fill='x', pady=(0, 20))
+        header.pack(fill="x", pady=(0, 20))
         
         # Create a frame to contain the message text with white background
-        msg_frame = tk.Frame(self, bg='white')
+        msg_frame = tk.Frame(self, bg="white")
         # Pack the message frame to expand and fill available space with padding
-        msg_frame.pack(expand=True, fill='both', padx=20, pady=(0, 20))
+        msg_frame.pack(expand=True, fill="both", padx=20, pady=(0, 20))
         
         # Create a label to display the message text
         msg_label = tk.Label(
             msg_frame,            # Place label in the message frame
             text=message,         # Set the message text
-            font=('Arial', 12),   # Use Arial font, size 12
+            font=("Arial", 12),   # Use Arial font, size 12
             wraplength=350,       # Wrap text if it exceeds 350 pixels
-            bg='white'           # White background to match frame
+            bg="white"           # White background to match frame
         )
         # Pack the message label to expand and center in its frame
         msg_label.pack(expand=True)
         
         # Create a frame for the OK button with white background
-        btn_frame = tk.Frame(self, bg='white')
+        btn_frame = tk.Frame(self, bg="white")
         # Pack the button frame to fill horizontally with padding
-        btn_frame.pack(fill='x', padx=20, pady=(0, 20))
+        btn_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Create a style configuration for the button
         style = ttk.Style()
         # Configure custom button style with padding and font
-        style.configure('Custom.TButton', 
+        style.configure("Custom.TButton", 
                        padding=10,           # Add padding around button text
-                       font=('Arial', 10))   # Set button font and size
+                       font=("Arial", 10))   # Set button font and size
         
         # Create the OK button with custom style
         ok_btn = ttk.Button(
             btn_frame,              # Place button in button frame
             text="OK",             # Set button text
-            style='Custom.TButton', # Apply custom style
+            style="Custom.TButton", # Apply custom style
             command=self.destroy    # Close window when clicked
         )
         # Pack the button to the right side of its frame
-        ok_btn.pack(side='right')
+        ok_btn.pack(side="right")
 
     def center_window(self):
         # Update window's geometry information
@@ -163,10 +163,10 @@ class Card:
     def get_symbol(self):
         # Dictionary mapping suit names to their unicode symbols
         suit_symbols = {
-            'Hearts': '♥',    # Red heart symbol
-            'Diamonds': '♦',  # Red diamond symbol
-            'Clubs': '♣',     # Black club symbol
-            'Spades': '♠'     # Black spade symbol
+            "Hearts": "♥",    # Red heart symbol
+            "Diamonds": "♦",  # Red diamond symbol
+            "Clubs": "♣",     # Black club symbol
+            "Spades": "♠"     # Black spade symbol
         }
         # Return the card's rank followed by its suit symbol
         return f"{self.rank}{suit_symbols[self.suit]}"
@@ -181,12 +181,12 @@ class BluffGameGUI:
         # Set the initial window size
         self.root.geometry("1024x768")
         # Set the background color to dark green
-        self.root.configure(bg='#1e4d2b')
+        self.root.configure(bg="#1e4d2b")
         
         # Define all possible card ranks in order from lowest to highest
-        self.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        self.ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
         # Define all possible card suits (red suits first, then black suits)
-        self.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+        self.suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
         
         # Initialize the game state (deck, hands, etc.)
         self.setup_game()
@@ -199,7 +199,7 @@ class BluffGameGUI:
         self.update_display()
         
         # Bind the window resize event to update the display
-        self.root.bind('<Configure>', lambda e: self.update_display())
+        self.root.bind("<Configure>", lambda e: self.update_display())
 
     def setup_game(self):
         # Create a complete deck of 52 cards using list comprehension
@@ -212,7 +212,7 @@ class BluffGameGUI:
         self.player_hand = []      # List to store player's cards
         self.computer_hand = []    # List to store computer's cards
         self.pile = []            # List to store cards played in current round
-        self.current_rank = '2'    # Start game with rank of 2
+        self.current_rank = "2"    # Start game with rank of 2
         self.selected_cards = set() # Set to track which cards player has selected
         
         # Deal cards alternately to player and computer until deck is empty
@@ -230,22 +230,22 @@ class BluffGameGUI:
 
     def create_gui(self):
         # Create main information frame at top of window
-        self.info_frame = tk.Frame(self.root, bg='#1e4d2b')  # Dark green background
+        self.info_frame = tk.Frame(self.root, bg="#1e4d2b")  # Dark green background
         # Pack frame to fill horizontally with padding
         self.info_frame.pack(fill='x', pady=10, padx=20)
         
         # Create left section of info frame for current rank display
-        self.info_left = tk.Frame(self.info_frame, bg='#1e4d2b')
+        self.info_left = tk.Frame(self.info_frame, bg="#1e4d2b")
         # Pack frame to left side
-        self.info_left.pack(side='left')
+        self.info_left.pack(side="left")
         
         # Create label showing current rank in play
         self.current_rank_label = tk.Label(
             self.info_left,           # Place in left info frame
             text="Current Rank: 2",    # Initial text showing rank 2
-            font=('Arial Bold', 16),   # Bold Arial font, size 16
-            bg='#1e4d2b',             # Dark green background
-            fg='white'                # White text color
+            font=("Arial Bold", 16),   # Bold Arial font, size 16
+            bg="#1e4d2b",             # Dark green background
+            fg="white"                # White text color
         )
         # Pack the rank label
         self.current_rank_label.pack()
@@ -254,120 +254,120 @@ class BluffGameGUI:
         self.computer_counter = tk.Label(
             self.info_frame,                  # Place in info frame
             text="Computer's Cards: 26",      # Initial text showing 26 cards
-            font=('Arial Bold', 16),          # Bold Arial font, size 16
-            bg='#1e4d2b',                    # Dark green background
-            fg='white'                       # White text color
+            font=("Arial Bold", 16),          # Bold Arial font, size 16
+            bg="#1e4d2b",                    # Dark green background
+            fg="white"                       # White text color
         )
         # Pack counter to right side
-        self.computer_counter.pack(side='right')
+        self.computer_counter.pack(side="right")
         
         # Create message label for displaying game notifications (e.g., "Computer calls bluff!")
         self.message_label = tk.Label(
             self.root,                # Place in main window
             text="",                  # Initially empty
-            font=('Arial Bold', 16),  # Bold Arial font, size 16
-            bg='#1e4d2b',            # Dark green background to match window
-            fg='#ff4444',            # Red text color for visibility
+            font=("Arial Bold", 16),  # Bold Arial font, size 16
+            bg="#1e4d2b",            # Dark green background to match window
+            fg="#ff4444",            # Red text color for visibility
             wraplength=800           # Wrap text if longer than 800 pixels
         )
         # Pack message label with vertical padding
         self.message_label.pack(pady=(0, 20))
         
         # Create frame for scrollable card display area
-        self.scroll_frame = tk.Frame(self.root, bg='#1e4d2b')
+        self.scroll_frame = tk.Frame(self.root, bg="#1e4d2b")
         # Pack frame to expand and fill available space with horizontal padding
-        self.scroll_frame.pack(expand=True, fill='both', padx=20)
+        self.scroll_frame.pack(expand=True, fill="both", padx=20)
         
         # Create canvas for drawing cards
         self.cards_canvas = tk.Canvas(
             self.scroll_frame,        # Place in scroll frame
-            bg='#1e4d2b',            # Dark green background
+            bg="#1e4d2b",            # Dark green background
             height=430,              # Fixed height for card display
             highlightthickness=0     # Remove canvas border
         )
         # Pack canvas to expand and fill available space
-        self.cards_canvas.pack(expand=True, fill='both')
+        self.cards_canvas.pack(expand=True, fill="both")
         
         # Configure style for game buttons
         style = ttk.Style()
         # Set custom button style with dark red theme
-        style.configure('Game.TButton',
+        style.configure("Game.TButton",
                        padding=10,                # Add padding around button text
-                       font=('Arial Bold', 12),   # Bold Arial font, size 12
-                       background='#8B0000',      # Dark red background
-                       foreground='white')        # White text
+                       font=("Arial Bold", 12),   # Bold Arial font, size 12
+                       background="#8B0000",      # Dark red background
+                       foreground="white")        # White text
         
         # Create black separator line between cards and menu bar
-        separator = tk.Frame(self.root, height=2, bg='black')
+        separator = tk.Frame(self.root, height=2, bg="black")
         # Pack separator at bottom of window
-        separator.pack(side='bottom', fill='x')
+        separator.pack(side="bottom", fill="x")
         
         # Create bottom menu bar with dark red background
-        self.menu_bar = tk.Frame(self.root, bg='#8B0000', height=150)
+        self.menu_bar = tk.Frame(self.root, bg="#8B0000", height=150)
         # Pack menu bar at bottom with fixed height
-        self.menu_bar.pack(side='bottom', fill='x')
+        self.menu_bar.pack(side="bottom", fill="x")
         # Prevent menu bar from resizing
         self.menu_bar.pack_propagate(False)
         
         # Create frame for selected cards counter on the left side
-        self.counter_frame = tk.Frame(self.menu_bar, bg='#8B0000')  # Dark red background
+        self.counter_frame = tk.Frame(self.menu_bar, bg="#8B0000")  # Dark red background
         # Pack frame to left side with padding
-        self.counter_frame.pack(side='left', padx=30)
+        self.counter_frame.pack(side="left", padx=30)
         
         # Create label to show number of currently selected cards
         self.selected_count_label = tk.Label(
             self.counter_frame,        # Place in counter frame
             text="Selected: 0",        # Initial text showing no cards selected
-            font=('Arial Bold', 16),   # Bold Arial font, size 16
-            bg='#8B0000',             # Dark red background
-            fg='white'                # White text color
+            font=("Arial Bold", 16),   # Bold Arial font, size 16
+            bg="#8B0000",             # Dark red background
+            fg="white"                # White text color
         )
         # Pack the selected count label
         self.selected_count_label.pack()
         
         # Create frame for player's cards counter on the right side
-        self.your_cards_frame = tk.Frame(self.menu_bar, bg='#8B0000')
+        self.your_cards_frame = tk.Frame(self.menu_bar, bg="#8B0000")
         # Pack frame to right side with padding
-        self.your_cards_frame.pack(side='right', padx=30)
+        self.your_cards_frame.pack(side="right", padx=30)
         
         # Create label to show number of cards in player's hand
         self.your_cards_label = tk.Label(
             self.your_cards_frame,     # Place in cards frame
             text="Your Cards: 26",     # Initial text showing 26 cards
-            font=('Arial Bold', 16),   # Bold Arial font, size 16
-            bg='#8B0000',             # Dark red background
-            fg='white'                # White text color
+            font=("Arial Bold", 16),   # Bold Arial font, size 16
+            bg="#8B0000",             # Dark red background
+            fg="white"                # White text color
         )
         # Pack the cards count label
         self.your_cards_label.pack()
         
         # Create center frame for main game buttons
-        self.button_frame = tk.Frame(self.menu_bar, bg='#8B0000')
+        self.button_frame = tk.Frame(self.menu_bar, bg="#8B0000")
         # Pack frame to expand and fill remaining space
-        self.button_frame.pack(expand=True, fill='both')
+        self.button_frame.pack(expand=True, fill="both")
         
         # Create container to center buttons vertically
-        button_container = tk.Frame(self.button_frame, bg='#8B0000', height=150)
+        button_container = tk.Frame(self.button_frame, bg="#8B0000", height=150)
         # Pack container to fill space
-        button_container.pack(expand=True, fill='both')
+        button_container.pack(expand=True, fill="both")
         # Prevent container from shrinking to fit content
         button_container.pack_propagate(False)
         
         # Create inner frame for precise button positioning
-        inner_button_frame = tk.Frame(button_container, bg='#8B0000')
+        inner_button_frame = tk.Frame(button_container, bg="#8B0000")
         # Place frame exactly in center of container
-        inner_button_frame.place(relx=0.5, rely=0.5, anchor='center')
+        inner_button_frame.place(relx=0.5, rely=0.5, anchor="center")
         
         # Create main "Play Cards" button with custom styling
         self.play_button = tk.Button(
             inner_button_frame,          # Place in centered inner frame
             text="Play Cards",           # Button text
-            font=('Arial Bold', 20),     # Large bold font for visibility
-            bg='white',                  # White background
-            fg='black',                  # Black text
-            activebackground='#e0e0e0',  # Slightly darker when clicked
-            activeforeground='black',    # Text stays black when clicked
-            relief='raised',             # 3D effect for button
+            font=("Arial Bold", 20),     # Large bold font for visibility
+            bg="white",                  # White background
+            fg="black",                  # Black text
+            activebackground="#e0e0e0",  # Slightly darker when clicked
+            activeforeground="black",    # Text stays black when clicked
+            relief="raised",             # 3D effect for button
             borderwidth=3,               # Thick border for better visibility
             padx=50,                     # Horizontal internal padding
             pady=20,                     # Vertical internal padding
@@ -380,12 +380,12 @@ class BluffGameGUI:
         self.call_bluff_button = tk.Button(
             inner_button_frame,          # Place in centered inner frame
             text="Call Bluff",           # Button text
-            font=('Arial Bold', 20),     # Large bold font
-            bg='white',                  # White background
-            fg='black',                  # Black text
-            activebackground='#e0e0e0',  # Slightly darker when clicked
-            activeforeground='black',    # Text stays black when clicked
-            relief='raised',             # 3D effect
+            font=("Arial Bold", 20),     # Large bold font
+            bg="white",                  # White background
+            fg="black",                  # Black text
+            activebackground="#e0e0e0",  # Slightly darker when clicked
+            activeforeground="black",    # Text stays black when clicked
+            relief="raised",             # 3D effect
             borderwidth=3,               # Thick border
             padx=50,                     # Horizontal padding
             pady=20,                     # Vertical padding
@@ -397,22 +397,19 @@ class BluffGameGUI:
         # Add hover effects to both game buttons
         for button in (self.play_button, self.call_bluff_button):
             # Bind mouse enter event to change background color
-            button.bind('<Enter>', 
-                       lambda e, b=button: b.configure(bg='#e0e0e0'))  # Darken when hovered
+            button.bind("<Enter>", 
+                       lambda e, b=button: b.configure(bg="#e0e0e0"))  # Darken when hovered
             # Bind mouse leave event to restore original color
-            button.bind('<Leave>', 
-                       lambda e, b=button: b.configure(bg='white'))    # Return to white when mouse leaves
+            button.bind("<Leave>", 
+                       lambda e, b=button: b.configure(bg="white"))    # Return to white when mouse leaves
         
         # Bind left mouse click on canvas to handle card selection
-        self.cards_canvas.bind('<Button-1>', self.on_card_click)
+        self.cards_canvas.bind("<Button-1>", self.on_card_click)
 
     def show_message(self, title, message, message_type="info"):
         """Display a temporary message in the game interface
         
-        Args:
-            title (str): Message title (unused in current implementation)
-            message (str): The message to display
-            message_type (str): Type of message for styling (unused in current implementation)
+        message: The message to display
         """
         # Update the message label with new text
         self.message_label.config(text=message)
@@ -428,7 +425,7 @@ class BluffGameGUI:
         self.current_rank_label.config(text=f"Current Rank: {self.current_rank}")
         
         # Clear the entire canvas before redrawing
-        self.cards_canvas.delete('all')
+        self.cards_canvas.delete("all")
         
         # Define fixed dimensions for card display
         card_width = 80    # Width of each card in pixels
@@ -469,12 +466,12 @@ class BluffGameGUI:
             
             # Draw card background rectangle
             # Use grey for selected cards, white for unselected
-            color = '#e0e0e0' if i in self.selected_cards else 'white'
+            color = "#e0e0e0" if i in self.selected_cards else "white"
             self.cards_canvas.create_rectangle(
                 x, y,                          # Top-left corner
                 x + card_width, y + card_height, # Bottom-right corner
                 fill=color,                     # Background color
-                outline='black',                # Border color
+                outline="black",                # Border color
                 width=2                         # Border width
             )
             
@@ -483,18 +480,18 @@ class BluffGameGUI:
                 self.cards_canvas.create_rectangle(
                     x + 2, y + 2,                    # Top-left corner (inset by 2 pixels)
                     x + card_width - 2, y + card_height - 2,  # Bottom-right corner (inset by 2 pixels)
-                    outline='#4CAF50',               # Green highlight color
+                    outline="#4CAF50",               # Green highlight color
                     width=3                          # Thick highlight border
                 )
             
             # Draw card symbol (e.g., "2♥") on the card
-            text_color = 'red' if card.suit in ['Hearts', 'Diamonds'] else 'black'  # Red for hearts/diamonds
+            text_color = "red" if card.suit in ["Hearts", "Diamonds"] else "black"  # Red for hearts/diamonds
             font_size = 20  # Fixed font size for card symbols
             self.cards_canvas.create_text(
                 x + card_width/2,                    # Center horizontally in card
                 y + card_height/2,                   # Center vertically in card
                 text=card.get_symbol(),              # Get card's symbol representation
-                font=('Arial', font_size),           # Arial font with fixed size
+                font=("Arial", font_size),           # Arial font with fixed size
                 fill=text_color                      # Red or black based on suit
             )
             
@@ -502,15 +499,14 @@ class BluffGameGUI:
             self.cards_canvas.create_rectangle(
                 x, y,                               # Top-left corner
                 x + card_width, y + card_height,    # Bottom-right corner
-                tags=f'card_{i}',                   # Tag with card index for identification
-                outline=''                          # Invisible outline
+                tags=f"card_{i}",                   # Tag with card index for identification
+                outline=""                          # Invisible outline
             )
 
     def on_card_click(self, event):
         """Handle mouse clicks on cards in the play area
         
-        Args:
-            event: The mouse click event containing x,y coordinates
+        event: The mouse click event containing x,y coordinates
         """
         # Convert canvas coordinates to scrolled coordinates (for future scrolling implementation)
         canvas_x = self.cards_canvas.canvasx(event.x)
@@ -524,9 +520,9 @@ class BluffGameGUI:
             tags = self.cards_canvas.gettags(item)
             for tag in tags:
                 # Check if the object is a card (has 'card_X' tag)
-                if tag.startswith('card_'):
+                if tag.startswith("card_"):
                     # Extract card index from tag
-                    card_index = int(tag.split('_')[1])
+                    card_index = int(tag.split("_")[1])
                     
                     # Toggle card selection
                     if card_index in self.selected_cards:
@@ -595,11 +591,10 @@ class BluffGameGUI:
     def computer_decide_bluff(self, num_cards_claimed):
         """Determine if computer should call player's bluff
         
-        Args:
-            num_cards_claimed (int): Number of cards player claims to be playing
+        num_cards_claimed: Number of cards player claims to be playing
             
-        Returns:
-            bool: True if computer decides to call bluff, False otherwise
+        Returns boolean:
+        True if computer decides to call bluff, False otherwise
         """
         # Threshold for random bluff calling (70% chance to let it pass)
         probability_threshold = 0.7
@@ -627,8 +622,8 @@ class BluffGameGUI:
         1. Play matching cards if it has them
         2. Bluff with random cards if it has no matching cards
         
-        Returns:
-            bool: True if computer is bluffing, False if playing honestly
+        Returns boolean:
+        True if computer is bluffing, False if playing honestly
         """
         # Find all cards in computer's hand that match the current rank
         cards_of_rank = [card for card in self.computer_hand if card.rank == self.current_rank]
@@ -743,7 +738,7 @@ class GameOverScreen(tk.Toplevel):
         self.title("Game Over")           # Set window title
         self.geometry("400x300")          # Set window size
         self.resizable(False, False)      # Prevent window resizing
-        self.configure(bg='#1e4d2b')      # Set dark green background
+        self.configure(bg="#1e4d2b")      # Set dark green background
         
         # Make window modal (blocks interaction with main window)
         self.transient(parent)
@@ -753,18 +748,18 @@ class GameOverScreen(tk.Toplevel):
         tk.Label(
             self,                         # Place in this window
             text="GAME OVER",             # Header text
-            font=('Arial Bold', 24),      # Large bold font
-            bg='#1e4d2b',                # Match window background
-            fg='white'                    # White text color
+            font=("Arial Bold", 24),      # Large bold font
+            bg="#1e4d2b",                # Match window background
+            fg="white"                    # White text color
         ).pack(pady=20)
         
         # Create result message label
         tk.Label(
             self,
             text=message,                 # Win/lose message
-            font=('Arial', 16),           # Medium size font
-            bg='#1e4d2b',                # Match window background
-            fg='white',                   # White text color
+            font=("Arial", 16),           # Medium size font
+            bg="#1e4d2b",                # Match window background
+            fg="white",                   # White text color
             wraplength=350               # Wrap text if too long
         ).pack(pady=20)
         
@@ -772,9 +767,9 @@ class GameOverScreen(tk.Toplevel):
         tk.Button(
             self,
             text="Play Again",            # Button text
-            font=('Arial Bold', 14),      # Bold font
-            bg='white',                   # White background
-            fg='black',                   # Black text
+            font=("Arial Bold", 14),      # Bold font
+            bg="white",                   # White background
+            fg="black",                   # Black text
             command=self.play_again,      # Method to call when clicked
             padx=20,                      # Horizontal padding
             pady=10                       # Vertical padding
@@ -784,9 +779,9 @@ class GameOverScreen(tk.Toplevel):
         tk.Button(
             self,
             text="Quit",                  # Button text
-            font=('Arial Bold', 14),      # Bold font
-            bg='#8B0000',                # Dark red background
-            fg='white',                   # White text
+            font=("Arial Bold", 14),      # Bold font
+            bg="#8B0000",                # Dark red background
+            fg="white",                   # White text
             command=self.quit_game,       # Method to call when clicked
             padx=20,                      # Horizontal padding
             pady=10                       # Vertical padding
