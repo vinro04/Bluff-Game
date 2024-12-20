@@ -1,11 +1,53 @@
-# Import the main tkinter library for creating the GUI
+"""For our group project, we have created a bluff card game that can be played against a computer.
+
+The Rules of the game are as follows:
+
+Objective: Be the first player to get rid of all your cards by playing correctly or bluffing.
+
+Play Order:
+Cards are played in sequential rank order, starting from Twos, then Threes, Fours, and so on, up to Aces.
+
+Starting Turn:
+The first player starts by playing Twos (if they have any).
+If they don't have any Twos, they can bluff by playing 1 to 4 cards of a different rank and declaring "Two(s)".
+
+Bluffing:
+If a player doesn't have the required rank, they can bluff by playing cards of a different rank.
+
+Calling Bluff:
+The opponent can call bluff to challenge a suspected bluff before the next turn starts.
+If the bluff is true (cards don't match the announced rank), the bluffing player takes all the cards in the pile.
+If the bluff is false (cards match the declared rank), the challenger takes all the cards in the pile.
+
+Played Cards:
+Cards are not shown until challenged.
+If a bluff is called, the cards played by the previous player are revealed.
+
+Next Turn:
+Play continues with the next rank in sequence (e.g., after Twos, play moves to Threes).
+If a bluff was called, the next rank begins with the player that won the previous round.
+
+Winning the Game:
+Be the first player to get rid of all your cards.
+
+
+How we proceeded to program the game:
+
+We started by looking at popular card games that could be played with only two players like "Go Fish" and "Uno" to understand how they work and how they were coded.
+We took inspiration from these codes and used the ideas we learned to write the bluff card game from scratch.
+To make the game more fun, we added a graphical user interface (GUI) so it looks better and is more enjoyable to play.
+While writing the code, we fixed most problems ourselves by testing and trying different solutions.
+If we couldn't solve a problem, we used AI as a last option to help fix bugs or improve the code.
+"""
+
+
+
+# Import the main tkinter library for creating the graphical user interface (GUI)
 import tkinter as tk
 # Import themed widgets from tkinter for better-looking buttons
 from tkinter import ttk
 # Import random module for shuffling cards and making random choices
 import random
-# Import defaultdict for creating dictionaries with default values (though not used in current code)
-from collections import defaultdict
 
 # Define a custom message box class that inherits from tkinter's Toplevel window
 class CustomMessageBox(tk.Toplevel):
